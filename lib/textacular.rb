@@ -32,33 +32,6 @@ module Textacular
     assemble_query(similarities, conditions, exclusive)
   end
 
-  def method_missing(method, *search_terms)
-    return super if self == ActiveRecord::Base
-    if Helper.dynamic_search_method?(method, self.columns)
-      exclusive = Helper.exclusive_dynamic_search_method?(method, self.columns)
-      columns = exclusive ? Helper.exclusive_dynamic_search_columns(method) : Helper.inclusive_dynamic_search_columns(method)
-      metaclass = class << self; self; end
-      metaclass.__send__(:define_method, method) do |*args|
-        query = columns.inject({}) do |query, column|
-          query.merge column => args.shift
-        end
-        self.send(Helper.search_type(method), query, exclusive)
-      end
-      __send__(method, *search_terms, exclusive)
-    else
-      super
-    end
-  rescue ActiveRecord::StatementInvalid
-    super
-  end
-
-  def respond_to?(method, include_private = false)
-    return super if self == ActiveRecord::Base
-    Helper.dynamic_search_method?(method, self.columns) or super
-  rescue StandardError
-    super
-  end
-
   private
 
   def munge_exclusive_and_query(exclusive, query)
