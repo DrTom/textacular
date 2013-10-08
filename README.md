@@ -2,6 +2,28 @@
 
 Further documentation available at http://textacular.github.com/textacular.
 
+## About this fork
+
+I had the following issues with the original textacular: 
+
+* Migrations would not run.
+* Stuck db queries in mri (c-ruby) (would just hang there), and
+* an insane number of spawned db-connections on j-ruby/torquebox.
+
+The latter disregarded the defined limit of the pool. The maximum server
+connections would be reached leaving the server practically unreachable!
+  
+The exact cause is not known but it seems to be related to the implementation
+of `method_missing`, and `respond_to` (and possibly some interaction with other
+gems). See also  <https://github.com/textacular/textacular/issues/15>.
+
+`method_missing` and `respond_to` are entirely removed in this fork. The
+dynamic text search methods will not work. This solved the issues I have seen.
+Side effects are possible but I haven not seen any.
+
+The dynamic text search is deprecated and will be removed in the original
+textacular. See <https://github.com/textacular/textacular/pull/16>. Until then
+this fork might fix your issues.
 
 ## DESCRIPTION:
 
