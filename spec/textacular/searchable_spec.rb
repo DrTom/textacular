@@ -9,6 +9,7 @@ class SearchableTest < Test::Unit::TestCase
         @jhony = WebComicWithSearchable.create :name => "Johnny Wander", :author => "Ananth & Yuko"
         @ddeeg = WebComicWithSearchable.create :name => "Dominic Deegan", :author => "Mookie"
         @penny = WebComicWithSearchable.create :name => "Penny Arcade", :author => "Tycho & Gabe"
+        @null  = WebComicWithSearchable.create :author => 'Foo'
       end
 
       teardown do
@@ -18,6 +19,13 @@ class SearchableTest < Test::Unit::TestCase
       should "search across all columns" do
         assert_equal [@penny], WebComicWithSearchable.advanced_search("Penny")
         assert_equal [@ddeeg], WebComicWithSearchable.advanced_search("Dominic")
+      end
+
+      should "still rank with NULL columns" do
+        comic = WebComicWithSearchable.basic_search('Foo').first
+        rank = comic.attributes.find { |key, value| key.to_s =~ /\Arank\d+\z/ }.last
+
+        assert rank
       end
     end
 
@@ -47,7 +55,7 @@ class SearchableTest < Test::Unit::TestCase
         should "be not fine with searching for crazy character #{search_term} with advanced search" do
           # Uses to_tsquery
           assert_raise(ActiveRecord::StatementInvalid) do
-            WebComicWithSearchableName.advanced_search(search_term).all
+            WebComicWithSearchableName.advanced_search(search_term).first
           end
         end
       end
@@ -61,7 +69,7 @@ class SearchableTest < Test::Unit::TestCase
         begin
           WebComicWithSearchableName.searchable_columns
         rescue NoMethodError => error
-          assert_match error.message, /private method/
+          assert_match /private method/, error.message
         end
       end
 
@@ -86,6 +94,9 @@ class SearchableTest < Test::Unit::TestCase
       should "only search across the given column" do
         assert_equal [@penny], WebComicWithSearchableNameAndAuthor.advanced_search("Penny")
         assert_equal [@penny], WebComicWithSearchableNameAndAuthor.advanced_search("Tycho")
+      end
+      should "allow includes" do
+        assert_equal [@penny], WebComicWithSearchableNameAndAuthor.includes(:characters).advanced_search("Penny")
       end
     end
   end

@@ -1,5 +1,19 @@
 # Change Log
 
+## 3.1.0
+
+* Avoid Deprecation warnings from ActiveRecord 4.0.0.rc2.
+* Fix `method_missing` in ActiveRecord 4.0.0.rc2.
+* Remove unused `Textacular#normalize` method.
+* Add `OR` example to the README.
+* Fix tests for Ruby 2.0.0 & related improvements.
+* Improve Rails integration.
+* Fix dependency loading for textacular rake tasks.
+* Fix ranking failures when rows had `NULL` column values.
+* Clean up Rakefile; should make developing the gem nicer.
+* DEPRECATION: The dynamic search helpers will be removed at the next major
+  release.
+
 ## 3.0.0
 
 * All deprecations have been resolved. This breaks backwards compatibility.

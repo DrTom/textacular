@@ -3,6 +3,9 @@ require 'active_record'
 require 'textacular/version'
 
 module Textacular
+  autoload :FullTextIndexer,         'textacular/full_text_indexer'
+  autoload :PostgresModuleInstaller, 'textacular/postgres_module_installer'
+
   def self.searchable_language
     'english'
   end
@@ -32,6 +35,7 @@ module Textacular
     assemble_query(similarities, conditions, exclusive)
   end
 
+
   private
 
   def munge_exclusive_and_query(exclusive, query)
@@ -55,7 +59,7 @@ module Textacular
         results += parse_query_hash(search_term, column_or_table)
       else
         column = connection.quote_column_name(column_or_table)
-        search_term = connection.quote normalize(Helper.normalize(search_term))
+        search_term = connection.quote Helper.normalize(search_term)
 
         results << [table_name, column, search_term]
       end
@@ -74,7 +78,7 @@ module Textacular
   end
 
   def basic_similarity_string(table_name, column, search_term)
-    "ts_rank(to_tsvector(#{quoted_language}, #{table_name}.#{column}::text), plainto_tsquery(#{quoted_language}, #{search_term}::text))"
+    "COALESCE(ts_rank(to_tsvector(#{quoted_language}, #{table_name}.#{column}::text), plainto_tsquery(#{quoted_language}, #{search_term}::text)), 0)"
   end
 
   def basic_condition_string(table_name, column, search_term)
@@ -91,7 +95,7 @@ module Textacular
   end
 
   def advanced_similarity_string(table_name, column, search_term)
-    "ts_rank(to_tsvector(#{quoted_language}, #{table_name}.#{column}::text), to_tsquery(#{quoted_language}, #{search_term}::text))"
+    "COALESCE(ts_rank(to_tsvector(#{quoted_language}, #{table_name}.#{column}::text), to_tsquery(#{quoted_language}, #{search_term}::text)), 0)"
   end
 
   def advanced_condition_string(table_name, column, search_term)
@@ -116,15 +120,19 @@ module Textacular
   end
 
   def assemble_query(similarities, conditions, exclusive)
-    rank = connection.quote_column_name('rank' + rand.to_s)
+    rank = connection.quote_column_name('rank' + rand(100000000000000000).to_s)
 
-    select("#{quoted_table_name + '.*,' if scoped.select_values.empty?} #{similarities.join(" + ")} AS #{rank}").
+    select("#{quoted_table_name + '.*,' if select_values.empty?} #{similarities.join(" + ")} AS #{rank}").
       where(conditions.join(exclusive ? " AND " : " OR ")).
       order("#{rank} DESC")
   end
 
-  def normalize(query)
-    query
+  def select_values
+    if ActiveRecord::VERSION::MAJOR == 4
+      all.select_values
+    else
+      scoped.select_values
+    end
   end
 
   def searchable_columns
@@ -197,4 +205,4 @@ module Textacular
   end
 end
 
-require File.expand_path(File.dirname(__FILE__) + '/textacular/full_text_indexer')
+require 'textacular/rails' if defined?(::Rails)

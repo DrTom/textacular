@@ -21,7 +21,7 @@ class TextacularTest < Test::Unit::TestCase
       begin
         ARStandIn.random
       rescue NoMethodError => error
-        assert_match error.message, /undefined method `random'/
+        assert_match /undefined method `random'/, error.message
       end
     end
 
@@ -31,7 +31,7 @@ class TextacularTest < Test::Unit::TestCase
       begin
         NotThere.random
       rescue NoMethodError => error
-        assert_match error.message, /undefined method `random'/
+        assert_match /undefined method `random'/, error.message
       end
     end
 
@@ -187,7 +187,7 @@ class TextacularTest < Test::Unit::TestCase
       end
 
       should "allow for 2 arguments to #respond_to?" do
-        assert GameExtendedWithTextacular.respond_to?(:normalize, true)
+        assert GameExtendedWithTextacular.respond_to?(:searchable_language, true)
       end
     end
 
