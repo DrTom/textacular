@@ -22,10 +22,12 @@ Gem::Specification.new do |s|
     'Rakefile',
     'lib/textacular.rb',
     'lib/textacular/full_text_indexer.rb',
+    'lib/textacular/migration_generator.rb',
     'lib/textacular/postgres_module_installer.rb',
     'lib/textacular/rails.rb',
     'lib/textacular/searchable.rb',
     'lib/textacular/tasks.rb',
+    'lib/textacular/trigram_installer.rb',
     'lib/textacular/version.rb'
   ]
   s.executables   = []
@@ -41,10 +43,12 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_development_dependency 'pg', '~> 0.14.0'
+  s.add_development_dependency 'minitest', '~> 4.x'
   s.add_development_dependency 'shoulda', '~> 2.11.3'
   s.add_development_dependency 'rake', '~> 0.9.0'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'pry-doc'
+  s.add_development_dependency 'flexmock'
 
-  s.add_dependency('activerecord', [">= 3.0", "< 4.1"])
+  s.add_dependency('activerecord', [">= 3.0", "< 4.2"])
 end

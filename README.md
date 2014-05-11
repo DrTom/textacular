@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/textacular/textacular.png)](https://travis-ci.org/textacular/textacular) [![Code Climate](https://codeclimate.com/github/textacular/textacular.png)](https://codeclimate.com/github/textacular/textacular)
 # textacular
 
 Further documentation available at http://textacular.github.com/textacular.
@@ -70,9 +71,12 @@ Game.basic_search(title: 'Mario', system: 'Nintendo')
 ```
 
 The `#advanced_search` method lets you use Postgres's search syntax like '|',
-'&' and '!' ('or', 'and', and 'not') as well as some other craziness. Check [the
-Postgres
-docs](http://www.postgresql.org/docs/9.2/static/datatype-textsearch.html) for more:
+'&' and '!' ('or', 'and', and 'not') as well as some other craziness. The ideal
+use for advanced_search is to take a search DSL you make up for your users and
+translate it to PG's syntax. If for some reason you want to put user input
+directly into an advanced search, you should be sure to catch exceptions from
+syntax errors. Check [the Postgres docs]
+(http://www.postgresql.org/docs/9.2/static/datatype-textsearch.html) for more:
 
 ```ruby
 Game.advanced_search(title: 'Street|Fantasy')
@@ -80,21 +84,14 @@ Game.advanced_search(system: '!PS2')
 ```
 
 Finally, the `#fuzzy_search` method lets you use Postgres's trigram search
-funcionality.
+functionality.
 
 In order to use this, you'll need to make sure your database has the `pg_trgm`
-module installed. On your development machine, you can `require textacular/tasks` and run
+module installed. Create and run a migration to install the module:
 
 ```
-rake textacular:install_trigram
-```
-
-Depending on your production environment, you might be able to use the rake
-task, or you might have to manually run a command. For Postgres 9.1 and above,
-you'll want to run
-
-```sql
-CREATE EXTENSION pg_trgm;
+rake textacular:create_trigram_migration
+rake db:migrate
 ```
 
 Once that's installed, you can use it like this:
@@ -102,6 +99,15 @@ Once that's installed, you can use it like this:
 ```ruby
 Comic.fuzzy_search(title: 'Questio') # matches Questionable Content
 ```
+
+Note that fuzzy searches are subject to a similarity threshold imposed by the `pg_trgm` module. The default is 0.3, meaning that at least 30% of the total string must match your search content. For example:
+
+```ruby
+Comic.fuzzy_search(title: 'Pearls') # matches Pearls Before Swine
+Comic.fuzzy_search(title: 'Pear') # does not match Pearls Before Swine
+```
+
+For more info, view the `pg_trgm` documentation, specifically [F.35.2. Functions and Operators](http://www.postgresql.org/docs/9.1/static/pgtrgm.html).
 
 Searches are also chainable:
 
