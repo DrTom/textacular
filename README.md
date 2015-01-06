@@ -1,5 +1,11 @@
-[![Build Status](https://travis-ci.org/textacular/textacular.png)](https://travis-ci.org/textacular/textacular) [![Code Climate](https://codeclimate.com/github/textacular/textacular.png)](https://codeclimate.com/github/textacular/textacular)
 # textacular
+[![Gem Version](http://img.shields.io/gem/v/textacular.svg)][rubygems]
+[![Build Status](https://img.shields.io/travis/textacular/textacular/master.svg)][travis]
+[![Code Climate](https://img.shields.io/codeclimate/github/textacular/textacular.svg)][codeclimate]
+
+[rubygems]: http://rubygems.org/gems/textacular
+[travis]: https://travis-ci.org/textacular/textacular
+[codeclimate]: https://codeclimate.com/github/textacular/textacular
 
 Further documentation available at http://textacular.github.com/textacular.
 
@@ -107,6 +113,12 @@ Comic.fuzzy_search(title: 'Pearls') # matches Pearls Before Swine
 Comic.fuzzy_search(title: 'Pear') # does not match Pearls Before Swine
 ```
 
+The similarity threshold is hardcoded in PostgreSQL and can be modified on a per-connection basis, for example:
+
+```ruby
+ActiveRecord::Base.connection.execute("SELECT set_limit(0.9);")
+```
+
 For more info, view the `pg_trgm` documentation, specifically [F.35.2. Functions and Operators](http://www.postgresql.org/docs/9.1/static/pgtrgm.html).
 
 Searches are also chainable:
@@ -171,23 +183,14 @@ $ gem install textacular
 
 ## Contributing
 
-Help is gladly welcomed. If you have a feature you'd like to add, it's much more
-likely to get in (or get in faster) the closer you stick to these steps:
+If you'd like to contribute, please see the [contribution guidelines](CONTRIBUTING.md).
 
-1. Open an Issue to talk about it. We can discuss whether it's the right
-  direction or maybe help track down a bug, etc.
-1. Fork the project, and make a branch to work on your feature/fix. Master is
-  where you'll want to start from.
-1. Write a test for the feature you are about to add
-1. Run the tests
-1. Turn the Issue into a Pull Request. There are several ways to do this, but
-  [hub](https://github.com/defunkt/hub) is probably the easiest.
-1. Bonus points if your Pull Request updates `CHANGES.md` to include a summary
-   of your changes and your name like the other entries. If the last entry is
-   the last release, add a new `## Unreleased` heading.
 
-If you don't know how to fix something, even just a Pull Request that includes a
-failing test can be helpful. If in doubt, make an Issue to discuss.
+## Releasing
+
+Maintainers: Please make sure to follow the [release steps](RELEASING.md) when
+it's time to cut a new release.
+
 
 ## LICENSE:
 

@@ -1,5 +1,15 @@
 # Change Log
 
+## Unreleased
+
+* Update the README to illustrate how to change the similarity threshold.
+
+## 3.2.1
+
+* Fix trigram installation migration reversed filename and content.
+* Rewrite all tests using RSpec.
+* We're ActiveRecord 4.2+ compatible until tests prove otherwise.
+
 ## 3.2.0
 
 * Add generator for trigram installation migration.
